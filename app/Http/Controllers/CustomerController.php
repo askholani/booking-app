@@ -27,33 +27,7 @@ class CustomerController extends Controller
 
         $playstations = \App\Models\Playstation::all();
 
-        // dd($bookings);
-        // dd($bookings);
         return view('cusotmer.booking', compact('breadcrumbs', 'playstations', 'user'), ['bookings' => $bookings]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**
@@ -80,20 +54,18 @@ class CustomerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Validate the request
+
         $request->validate([
             'username'     => 'required|string|max:255',
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|max:255|unique:users,email,' . $id,
             'phone_number' => 'nullable|string|max:20',
             'address'      => 'nullable|string|max:500',
-            'password'     => 'nullable|min:8', // Password is optional but must be confirmed if provided
+            'password'     => 'nullable|min:8',
         ]);
 
-        // Find the user
         $user = User::findOrFail($id);
 
-        // Prepare update data
         $updateData = [
             'username'     => $request->input('username'),
             'name'         => $request->input('name'),
@@ -102,24 +74,14 @@ class CustomerController extends Controller
             'address'      => $request->input('address'),
         ];
 
-        // Update password only if provided
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
         }
 
-        // Update user data
         $user->update($updateData);
 
-        // Redirect with success message
         Alert::success('Success', 'Data has been updated successfully!');
         return redirect()->back();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

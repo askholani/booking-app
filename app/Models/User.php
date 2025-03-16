@@ -19,7 +19,7 @@ class User extends Authenticatable
         'phone_number',
         'address',
         'username',
-        // 'level_id'2,
+
     ];
 
     protected $hidden = [
@@ -37,10 +37,6 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    // public function level()
-    // {
-    //     return $this->belongsTo(Level::class);
-    // }
 
     public function payments()
     {

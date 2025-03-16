@@ -14,54 +14,35 @@ class BookingController extends Controller
     {
         $breadcrumbs = [
             ['name' => 'Admin'],
-            // ['name' => 'Booking'],
+
         ];
 
         $query = Booking::with(['user', 'payment', 'playstation']);
 
-        // Get filter and sorting inputs
         $status    = $request->input('status');
-        $sortOrder = $request->input('sortOrder', 'desc'); // Default sorting is descending
+        $sortOrder = $request->input('sortOrder', 'desc');
 
-        // Apply status filter if selected
         if ($status) {
             $query->where('status', $status);
         }
 
-        // Apply sorting by date
         $query->orderBy('date', $sortOrder);
 
-        // Paginate results
         $bookings = $query->paginate(3);
 
-        // Format data
         $bookings->getCollection()->transform(function ($item) {
             $item->setAttribute('total_price', 'Rp ' . number_format($item->total_price, 2, ',', '.'));
             $item->setAttribute('date', date('d F Y', strtotime($item->date)));
             return $item;
         });
 
-        // Get unique status values for filtering
         $statuses = Booking::select('status')->distinct()->pluck('status');
 
         return view('booking.index', compact('breadcrumbs', 'bookings', 'statuses', 'status', 'sortOrder'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
 
-        // dd("hai");
         $request->validate([
             'user_id'        => 'required|exists:users,id',
             'playstation_id' => 'required|exists:playstations,id',
@@ -84,7 +65,7 @@ class BookingController extends Controller
             'payment_id'     => $request->payment_id,
             'date'           => $request->date,
             'total_price'    => $total_price,
-            // 'status'         => $request->status,
+
             'status'         => "pending",
         ]);
 
@@ -93,36 +74,11 @@ class BookingController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Booking $booking)
     {
-        // dd($booking);
-        // $booking->delete();
+
         $booking->update([
             'status' => 'canceled',
         ]);

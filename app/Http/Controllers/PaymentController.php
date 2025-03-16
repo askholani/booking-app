@@ -20,31 +20,23 @@ class PaymentController extends Controller
 
         $query = Payment::with('user');
 
-        // Get filter and sort parameters
         $status    = $request->input('status');
-        $sortOrder = $request->input('sortOrder', 'desc'); // Default sorting is descending
+        $sortOrder = $request->input('sortOrder', 'desc');
 
-        // Apply status filter if selected
         if ($status) {
             $query->where('status', $status);
         }
 
-        // Only allow sorting by payment_date
         $query->orderBy('payment_date', $sortOrder);
 
         $data = $query->paginate(10);
 
-        // Add formatted total_payment
-        // $data->getCollection()->transform(fn($item) =>
-        //     $item->setAttribute('total_payment', 'Rp ' . number_format($item->amount, 2, ',', '.'))
-        // );
         $data->getCollection()->transform(function ($item) {
             $item->setAttribute('total_payment', 'Rp ' . number_format($item->amount, 2, ',', '.'));
             $item->setAttribute('payment_date', date('d F Y', strtotime($item->payment_date)));
             return $item;
         });
 
-        // Get unique status values for filtering
         $statuses = Payment::select('status')->distinct()->pluck('status');
 
         return view('payment.index', compact('data', 'breadcrumbs', 'statuses', 'status', 'sortOrder'));
